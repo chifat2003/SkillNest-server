@@ -1,5 +1,5 @@
 const express = require("express");
-const mongoose = require("mongoose");
+const { MongoClient } = require("mongodb");
 const cors = require("cors");
 require("dotenv").config();
 
@@ -9,14 +9,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+let db = null;
+let client = null;
+
 // Routes
 app.get("/", (req, res) => {
   res.send("SkillNest Server is running 🚀");
 });
 
 app.get("/ping", (req, res) => {
-  const dbStatus =
-    mongoose.connection.readyState === 1 ? "connected" : "disconnected";
+  const dbStatus = client && client.topology && client.topology.isConnected()
+    ? "connected"
+    : "disconnected";
 
   res.json({
     status: "ok",
@@ -28,13 +32,18 @@ app.get("/ping", (req, res) => {
 // MongoDB Connection
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
+    client = new MongoClient(process.env.MONGODB_URI);
+    await client.connect();
+    db = client.db();
     console.log("✅ MongoDB connected successfully");
   } catch (err) {
     console.error("❌ MongoDB connection failed:", err.message);
     process.exit(1);
   }
 };
+
+// Export db for use in other modules
+module.exports = { getDb: () => db };
 
 // Start Server
 const PORT = process.env.PORT || 5000;
