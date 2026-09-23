@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
+    "db:indexes": "node scripts/createIndexes.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
