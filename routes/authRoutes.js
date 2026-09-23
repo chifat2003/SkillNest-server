@@ -1,11 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const { register, login, getMe } = require("../controllers/authController");
+const { register, login, getMe,
+  googleLogin,
+  googleCallback, } = require("../controllers/authController");
 const { authenticateToken, authorizeRoles } = require("../middleware/authMiddleware");
 
 // Public Routes
 router.post("/register", register);
 router.post("/login", login);
+
+router.get("/google", googleLogin);
+router.get("/google/callback", googleCallback);
 
 // Authenticated Route
 router.get("/me", authenticateToken, getMe);
